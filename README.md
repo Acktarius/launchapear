@@ -1,6 +1,9 @@
 # launchapear
 launch a pear app using a link
 
+## DISCLAIMER
+Only launch link you trust !
+
 ## check
 make sure *launchapear.sh* and *shortcut_installer.sh* are executable,  
 if not :  
