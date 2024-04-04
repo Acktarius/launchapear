@@ -3,6 +3,7 @@ launch a pear app using a link
 
 ## DISCLAIMER
 Only launch link you trust !
+this script is delivered “as is” and the author deny any and all liability for any damages arising out of using it! 
 
 ## check
 make sure *launchapear.sh* and *shortcut_installer.sh* are executable,  
@@ -18,6 +19,11 @@ in terminal, (Ctrl + Alt +T)
 `source shortcut_installer.sh`  
 
 new icon should appear on your desktop, if not logout and log back in.
+
+---  
+
+#TODO: 
+- [ ] Sandbox
 
 ---  
 comments, questions, suggestions:  
