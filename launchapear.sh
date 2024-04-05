@@ -71,7 +71,7 @@ sleep 1
 trip
 fi 
 
-if [[ ${#pearLink} -gt 59 ]]; then
+if [[ ${#pearLink} -gt 120 ]]; then
 zenwarn "pear link seems a bit too long"
 sleep 1
 trip
