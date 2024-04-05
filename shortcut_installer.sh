@@ -17,6 +17,7 @@ cat << EOF > /home/${user}/.local/share/applications/launchapear.desktop
 [Desktop Entry]
 Encoding=UTF-8
 Name=Launch a Pear
+Path=${path}
 Exec=${path}/launchapear.sh
 Terminal=false
 Type=Application
