@@ -1,9 +1,13 @@
 # launchapear
-launch a pear app using a link
+launch a pear app using a link  
+*made and tested on Ubuntu*
 
 ## DISCLAIMER
 Only launch link you trust !
 this script is delivered “as is” and the author deny any and all liability for any damages arising out of using it! 
+
+## Dependencies required
+pgp, zenity, pear
 
 ## check
 make sure *launchapear.sh* and *shortcut_installer.sh* are executable,  
@@ -23,7 +27,9 @@ new icon should appear on your desktop, if not logout and log back in.
 ---  
 
 #TODO: 
+
 - [ ] Sandbox
+- [x] Personal encrypted whitelist
 
 ---  
 comments, questions, suggestions:  
