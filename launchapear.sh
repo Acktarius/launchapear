@@ -59,10 +59,12 @@ zeninfo "pear link won't be launched,\nyou're never too cautious\n\n\tBye now"
 }
 
 #MAIN
+main() {
 pearLink=$(zenity --entry --title="launch a 🍐" --text="Enter pear link:" \
 --width=520 \
---entry-text "pear://")
-
+--entry-text "$1")
+}
+main "pear://"
 
 if [[ "${pearLink:0:7}" != "pear://" ]]; then
 zenwarn "pear link should start with:\n \
@@ -118,6 +120,16 @@ if (zenity --text-info \
        --filename=${path}/info_temp.md \
        --checkbox="I want to add it to the white list"); then
 listIt $1
+case $? in
+    0)
+    sleep 1
+    main "$1"
+    ;;
+    *)
+    trip
+    ;;
+esac
+
 else
 zeninfo "pear link won't be added,\nyou're never too cautious\n\n\tBye now"
 fi
