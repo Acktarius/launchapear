@@ -1,7 +1,7 @@
 #!/bin/bash
 #shorcut installer for launchapear Ubuntu users
 # this file is subject to Licence
-#Copyright (c) 2024, Acktarius
+#Copyright (c) 2024-2025, Acktarius
 #
 # make sure ./shortcut_installer.sh is an executable file
 # otherwise, run: sudo chmod 755 shortcut_installer.sh
