@@ -14,9 +14,9 @@ XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 APPIMAGE_WHITELIST="${XDG_DATA_HOME}/launchapear/.whitelistgpg"
 CURRENT_DIR_WHITELIST="${path}/.whitelistgpg"
 
-# Check if we are actually running as our LaunchAPear AppImage
-# This checks if the script is running from /usr/bin/launchapear inside a LaunchAPear AppImage
-if [[ "$path" == "/usr/bin" && -n "$APPIMAGE" && "$APPIMAGE" == *"LaunchAPear"* ]]; then
+# Better AppImage detection
+# Check if path contains .mount_ which indicates AppImage environment
+if [[ "$path" == *".mount_"* && "$path" == */usr/bin ]]; then
     WHITELIST_FILE="${APPIMAGE_WHITELIST}"
 else
     WHITELIST_FILE="${CURRENT_DIR_WHITELIST}"
@@ -90,10 +90,18 @@ zenerror() {
 
 if [[ ! -f ${WHITELIST_FILE} ]]; then
     # Always ensure the directory exists before trying to create the whitelist
-    mkdir -p "$(dirname "${WHITELIST_FILE}")" 2>/dev/null
+    if ! mkdir -p "$(dirname "${WHITELIST_FILE}")" 2>/dev/null; then
+        # If directory creation fails
+        zenerror "Failed to create directory for whitelist.\nPlease check permissions."
+        exit 1
+    fi
     
     if (zenity --question --text="No whitelist, one will be created"); then
-        echo "pear://keet pear://runtime" | gpg -c > ${WHITELIST_FILE}
+        if ! echo "pear://keet pear://runtime" | gpg -c > "${WHITELIST_FILE}" 2>/dev/null; then
+            # If writing to whitelist fails
+            zenerror "Failed to create whitelist file.\nPlease check permissions."
+            exit 1
+        fi
     else
         trip
     fi
