@@ -26,6 +26,7 @@ jobs:
           mkdir -p AppDir/usr/bin
           mkdir -p AppDir/usr/share/applications
           mkdir -p AppDir/usr/share/icons/hicolor/128x128/apps
+          mkdir -p AppDir/usr/share/launchapear/ressources
           
           # Copy script to AppDir
           cp launchapear.sh AppDir/usr/bin/launchapear
@@ -74,8 +75,10 @@ jobs:
           export ARCH=x86_64
           export OUTPUT="LaunchAPear-$VERSION-$ARCH.AppImage"
           
-          # Build the AppImage
-          ./linuxdeploy-x86_64.AppImage --appdir=AppDir --output=appimage
+          # Build the AppImage with explicit icon file parameter
+          ./linuxdeploy-x86_64.AppImage --appdir=AppDir \
+            --icon-file=AppDir/usr/share/icons/hicolor/128x128/apps/launchapear.png \
+            --output=appimage
           
           # List the created files
           ls -la *.AppImage

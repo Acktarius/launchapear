@@ -8,7 +8,19 @@
 path=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Configuration
-WHITELIST_FILE="${path}/.whitelistgpg"
+# First check for AppImage location, then fall back to current directory
+APPIMAGE_WHITELIST="/usr/share/launchapear/ressources/.whitelistgpg"
+CURRENT_DIR_WHITELIST="${path}/.whitelistgpg"
+
+# Set the whitelist file location
+if [[ -f "${APPIMAGE_WHITELIST}" ]]; then
+    WHITELIST_FILE="${APPIMAGE_WHITELIST}"
+    # Make sure the directory exists for writing
+    mkdir -p "$(dirname "${APPIMAGE_WHITELIST}")" 2>/dev/null
+else
+    WHITELIST_FILE="${CURRENT_DIR_WHITELIST}"
+fi
+
 MAX_LINK_LENGTH=120
 
 #trip
@@ -76,6 +88,9 @@ zenerror() {
 }
 
 if [[ ! -f ${WHITELIST_FILE} ]]; then
+    # Create directory for whitelist if it doesn't exist (especially for AppImage)
+    mkdir -p "$(dirname "${WHITELIST_FILE}")" 2>/dev/null
+    
     if (zenity --question --text="No whitelist, one will be created"); then
     echo "pear://keet pear://runtime" | gpg -c > ${WHITELIST_FILE}
     else
