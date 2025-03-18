@@ -1,0 +1,170 @@
+#!/bin/bash
+################################################################################
+# this file is subject to Licence
+#Copyright (c) 2024-2025, Acktarius
+################################################################################
+# Function to check if a package is installed
+check_package() {
+    if ! command -v $1 &> /dev/null; then
+        return 1
+    fi
+    return 0
+}
+
+# Get the directory where the AppImage is mounted
+APPDIR="$(dirname "$(readlink -f "$0")")"
+
+# 1. Check for zenity first - we need it for UI dialogs
+if ! check_package zenity; then
+    echo "Zenity is required. Please install it using your package manager and try again."
+    exit 1
+fi
+
+# 2. Determine package manager
+PM_NAME=""
+PM_CMD=""
+
+if command -v apt &> /dev/null; then
+    PM_NAME="apt"
+    PM_CMD="apt install -y"
+elif command -v dnf &> /dev/null; then
+    PM_NAME="dnf"
+    PM_CMD="dnf install -y"
+elif command -v pacman &> /dev/null; then
+    PM_NAME="pacman"
+    PM_CMD="pacman -S --noconfirm"
+elif command -v zypper &> /dev/null; then
+    PM_NAME="zypper"
+    PM_CMD="zypper install -y"
+else
+    zenity --error --title="Error" --text="Could not detect package manager.\nPlease install required packages manually."
+    exit 1
+fi
+
+# 3. Check for pear
+if ! check_package pear; then
+    if zenity --question \
+        --title="Install Dependency" \
+        --text="Pear is required and needs to be installed.\nWould you like to install it now?" \
+        --ok-label="Install" \
+        --cancel-label="Cancel"; then
+        
+        # Inform user that pear installation might be more complex
+        zenity --info --title="Pear Installation" --text="Pear installation may require additional steps.\nPlease visit https://docs.pears.com/guides/getting-started for installation instructions."
+        
+        # Open browser to the pear installation guide
+        if check_package xdg-open; then
+            xdg-open "https://docs.pears.com/guides/getting-started"
+        fi
+        
+        exit 1
+    else
+        exit 1
+    fi
+fi
+
+# 4. Check for gpg
+if ! check_package gpg; then
+    if zenity --question \
+        --title="Install Dependency" \
+        --text="GnuPG is required and needs to be installed.\nWould you like to install it now?" \
+        --ok-label="Install" \
+        --cancel-label="Cancel"; then
+        
+        if ! pkexec $PM_CMD gnupg; then
+            zenity --error --title="Error" --text="Failed to install GnuPG. Please install it manually."
+            exit 1
+        fi
+    else
+        exit 1
+    fi
+fi
+
+# Setup desktop file if not exists
+if [ -n "$APPIMAGE" ]; then  # Only create desktop file if we're running as an AppImage
+    DESKTOP_FILE="/usr/share/applications/launchapear.desktop"
+    if [ ! -f "$DESKTOP_FILE" ]; then
+        if zenity --question \
+            --title="Desktop Integration" \
+            --text="Would you like to add 'Launch a Pear' to your applications menu?" \
+            --ok-label="Yes" \
+            --cancel-label="No"; then
+            
+            # Create desktop file and copy icons in one pkexec session
+            SETUP_SCRIPT="/tmp/launchapear_setup_$$"
+            
+            # Get the real user before escalating privileges - try multiple methods
+            if [ -n "${SUDO_USER}" ]; then
+                REAL_USER="${SUDO_USER}"
+            elif [ -n "${USER}" ]; then
+                REAL_USER="${USER}"
+            else
+                REAL_USER="$(logname 2>/dev/null || id -un)"
+            fi
+
+            # Verify we got a valid username
+            if [ -z "${REAL_USER}" ]; then
+                zenity --error --title="Error" --text="Could not determine the current user."
+                rm -f "${SETUP_SCRIPT}"
+                exit 1
+            fi
+
+            # Define directories for user icons
+            ICONS_DIR="/home/${REAL_USER}/.local/share/icons"
+
+            # Copy icon to tmp first (as regular user)
+            TEMP_ICON="/tmp/launchapear_$$.png"
+            cp "${APPDIR}/launchapear.png" "${TEMP_ICON}"
+
+            # Create setup script
+            cat > "${SETUP_SCRIPT}" << EOL
+#!/bin/bash
+
+# Create system-wide desktop file
+cat > "${DESKTOP_FILE}" << EOF
+[Desktop Entry]
+Type=Application
+Name=Launch a Pear
+Comment=Launch Pear applications securely
+Exec=${APPIMAGE}
+Icon=launchapear
+Categories=Office;Utility;Network;
+Terminal=false
+Keywords=pear;launcher;
+StartupNotify=true
+EOF
+chmod 644 "${DESKTOP_FILE}"
+
+# Install icon in user's directory
+mkdir -p "${ICONS_DIR}"
+cp "${TEMP_ICON}" "${ICONS_DIR}/launchapear.png"
+chown -R "${REAL_USER}:${REAL_USER}" "${ICONS_DIR}"
+chmod 644 "${ICONS_DIR}/launchapear.png"
+
+# Clean up
+rm -f "${TEMP_ICON}"
+
+# Update desktop database if command exists
+if command -v update-desktop-database &> /dev/null; then
+    update-desktop-database
+fi
+EOL
+
+            chmod 755 "${SETUP_SCRIPT}"
+            
+            if ! pkexec "${SETUP_SCRIPT}"; then
+                zenity --error --title="Error" --text="Failed to create desktop shortcut and install icon."
+            fi
+            
+            # Clean up temp script
+            rm -f "${SETUP_SCRIPT}"
+        fi
+    fi
+fi
+
+# Set environment variables
+export PATH="${APPDIR}/usr/bin:${PATH}"
+export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${LD_LIBRARY_PATH}"
+
+# Launch the application
+exec "${APPDIR}/usr/bin/launchapear" "$@" 

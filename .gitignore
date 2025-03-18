@@ -1,1 +1,18 @@
+# Whitelist file - usually encrypted
 .whitelistgpg
+
+# Build artifacts
+AppDir/
+*.AppImage
+linuxdeploy-*.AppImage
+# But keep important scripts
+!AppRun
+!basic_apprun.sh
+
+# Temporary files
+info_temp.md
+/tmp/pear_output_*.txt
+
+# OS specific files
+.DS_Store
+Thumbs.db

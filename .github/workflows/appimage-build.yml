@@ -1,0 +1,85 @@
+name: Build and Release AppImage
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2 desktop-file-utils
+
+      - name: Set up AppDir structure
+        run: |
+          mkdir -p AppDir/usr/bin
+          mkdir -p AppDir/usr/share/applications
+          mkdir -p AppDir/usr/share/icons/hicolor/128x128/apps
+          
+          # Copy script to AppDir
+          cp launchapear.sh AppDir/usr/bin/launchapear
+          chmod +x AppDir/usr/bin/launchapear
+          
+          # Copy icon
+          cp icon/pearrocket.png AppDir/usr/share/icons/hicolor/128x128/apps/launchapear.png
+          # Also copy to AppDir root for desktop integration
+          cp icon/pearrocket.png AppDir/launchapear.png
+          
+          # Create desktop file
+          cat << EOF > AppDir/usr/share/applications/launchapear.desktop
+          [Desktop Entry]
+          Encoding=UTF-8
+          Name=Launch a Pear
+          Path=/usr/bin
+          Exec=launchapear
+          Terminal=false
+          Type=Application
+          Icon=launchapear
+          Hidden=false
+          NoDisplay=false
+          Categories=Office;Utility;Network;
+          X-GNOME-Autostart-enabled=true
+          Comment=Launch Pear applications securely
+          Keywords=pear;launcher;
+          StartupNotify=true
+          EOF
+          
+          # Copy AppRun script to AppDir
+          cp AppRun AppDir/AppRun
+          chmod +x AppDir/AppRun
+
+      - name: Download linuxdeploy
+        run: |
+          wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy-x86_64.AppImage
+
+      - name: Build AppImage
+        run: |
+          # Extract tag name without 'v' prefix
+          VERSION=${GITHUB_REF#refs/tags/v}
+          
+          # Set environment variables for linuxdeploy
+          export VERSION=$VERSION
+          export ARCH=x86_64
+          export OUTPUT="LaunchAPear-$VERSION-$ARCH.AppImage"
+          
+          # Build the AppImage
+          ./linuxdeploy-x86_64.AppImage --appdir=AppDir --output=appimage
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: LaunchAPear*.AppImage
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
