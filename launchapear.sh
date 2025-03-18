@@ -9,11 +9,14 @@ path=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Configuration
 # Define whitelist locations
-APPIMAGE_WHITELIST="/usr/share/launchapear/ressources/.whitelistgpg"
+# Use XDG_DATA_HOME if defined, otherwise default to ~/.local/share
+XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+APPIMAGE_WHITELIST="${XDG_DATA_HOME}/launchapear/.whitelistgpg"
 CURRENT_DIR_WHITELIST="${path}/.whitelistgpg"
 
-# Choose whitelist location based on whether we're running as an AppImage
-if [ -n "$APPIMAGE" ]; then
+# Check if we are actually running as our LaunchAPear AppImage
+# This checks if the script is running from /usr/bin/launchapear inside a LaunchAPear AppImage
+if [[ "$path" == "/usr/bin" && -n "$APPIMAGE" && "$APPIMAGE" == *"LaunchAPear"* ]]; then
     WHITELIST_FILE="${APPIMAGE_WHITELIST}"
 else
     WHITELIST_FILE="${CURRENT_DIR_WHITELIST}"

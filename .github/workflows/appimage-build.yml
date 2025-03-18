@@ -26,7 +26,6 @@ jobs:
           mkdir -p AppDir/usr/bin
           mkdir -p AppDir/usr/share/applications
           mkdir -p AppDir/usr/share/icons/hicolor/128x128/apps
-          mkdir -p AppDir/usr/share/launchapear/ressources
           
           # Copy script to AppDir
           cp launchapear.sh AppDir/usr/bin/launchapear
