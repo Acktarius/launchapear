@@ -44,7 +44,7 @@ The application is available as an AppImage, which provides these benefits:
    ./LaunchAPear-*.AppImage
    ```
 
-When running as an AppImage, the whitelist will be stored in `/usr/share/launchapear/ressources/` directory within the AppImage filesystem. If you've been using the script directly before, your existing whitelist in the current directory will still be used.
+When running as an AppImage, the application will automatically detect the AppImage environment and store the whitelist in `/usr/share/launchapear/ressources/` directory within the AppImage filesystem. When running directly as a script, it will use the whitelist in the current directory.
 
 ### Verifying Integrity
 
