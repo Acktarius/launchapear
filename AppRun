@@ -162,6 +162,18 @@ EOL
     fi
 fi
 
+# Create required data directories for whitelist
+if [ -n "$APPIMAGE" ]; then
+    # Ensure XDG data directory exists
+    XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+    LAUNCHAPEAR_DATA_DIR="${XDG_DATA_HOME}/launchapear"
+    mkdir -p "$LAUNCHAPEAR_DATA_DIR"
+    
+    # Make sure our temporary files can be written by marking the APPIMAGE environment
+    # variable explicitly for our script to detect
+    export LAUNCHAPEAR_APPIMAGE="true"
+fi
+
 # Set environment variables
 export PATH="${APPDIR}/usr/bin:${PATH}"
 export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${LD_LIBRARY_PATH}"

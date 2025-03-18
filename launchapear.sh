@@ -14,9 +14,8 @@ XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 APPIMAGE_WHITELIST="${XDG_DATA_HOME}/launchapear/.whitelistgpg"
 CURRENT_DIR_WHITELIST="${path}/.whitelistgpg"
 
-# Better AppImage detection
-# Check if path contains .mount_ which indicates AppImage environment
-if [[ "$path" == *".mount_"* && "$path" == */usr/bin ]]; then
+# Better AppImage detection using environment variable set in AppRun
+if [[ -n "$LAUNCHAPEAR_APPIMAGE" ]]; then
     WHITELIST_FILE="${APPIMAGE_WHITELIST}"
 else
     WHITELIST_FILE="${CURRENT_DIR_WHITELIST}"
@@ -110,7 +109,7 @@ fi
 #functions
 launchPear() {
     local link="$1"
-    local tmp_output_file="/tmp/pear_output_$$.txt"
+    local tmp_output_file="/tmp/launchapear_output_$$.txt"
     local app_pid
     local trust_issue
     local line_count
@@ -205,14 +204,16 @@ set -e
     if [[ "${notValid}" -gt "0" ]]; then
     zenwarn "pear link is not valid"
     else
-    echo "${info_temp}" > info_temp.md
+    # Use /tmp for temporary files to avoid read-only filesystem issues
+    local info_temp_file="/tmp/launchapear_info_$$.md"
+    echo "${info_temp}" > "$info_temp_file"
         if (zenity --text-info \
             --title="NOT IN YOUR WHITE LIST - Pear link info" \
             --width=480 \
             --height=640 \
-            --filename=${path}/info_temp.md \
+            --filename="$info_temp_file" \
             --checkbox="I want to add it to the white list"); then
-        rm -f ${path}/info_temp.md  
+        rm -f "$info_temp_file"  
         listIt "${link}"
             case $? in
                 0)
@@ -226,7 +227,7 @@ set -e
         else
         zeninfo "pear link won't be added,\nyou're never too cautious\n\n\tBye now"
         fi
-    rm -f ${path}/info_temp.md     
+    rm -f "$info_temp_file"     
     fi  
 }
 
