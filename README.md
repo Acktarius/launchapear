@@ -9,6 +9,21 @@ A secure launcher for Pear apps with whitelisting capabilities.
 - Automatic detection of terminal/desktop apps
 - GPG encryption for the whitelist
 
+## Dependencies
+
+- zenity
+- pear
+- gpg
+
+## License
+
+This project is licensed under the terms of the included LICENSE file.
+
+## DISCLAIMER
+Only launch link you trust !
+this script is delivered "as is" and the author deny any and all liability for any damages arising out of using it! 
+
+
 ## AppImage
 
 The application is available as an AppImage, which provides these benefits:
@@ -29,82 +44,39 @@ The application is available as an AppImage, which provides these benefits:
    ./LaunchAPear-*.AppImage
    ```
 
-### Building the AppImage Manually
+### Verifying Integrity
 
-If you want to build the AppImage yourself:
+Each release includes an MD5 checksum file to verify the integrity of your download:
 
-1. Clone this repository
-2. Make sure you have `linuxdeploy` installed
-3. Run the build script:
+1. Download both the AppImage and the MD5 checksum file
+2. Verify the integrity by running:
    ```bash
-   # Extract version from git tag or set manually
-   VERSION=$(git describe --tags --always | sed 's/^v//')
-   
-   # Create AppDir structure
-   mkdir -p AppDir/usr/bin
-   mkdir -p AppDir/usr/share/applications
-   mkdir -p AppDir/usr/share/icons/hicolor/128x128/apps
-   
-   # Copy files
-   cp launchapear.sh AppDir/usr/bin/launchapear
-   cp icon/pearrocket.png AppDir/usr/share/icons/hicolor/128x128/apps/launchapear.png
-   cp icon/pearrocket.png AppDir/launchapear.png
-   cp AppRun AppDir/AppRun
-   
-   # Make scripts executable
-   chmod +x AppDir/usr/bin/launchapear AppDir/AppRun
-   
-   # Create desktop file
-   cat > AppDir/usr/share/applications/launchapear.desktop << EOF
-   [Desktop Entry]
-   Type=Application
-   Name=Launch a Pear
-   Comment=Launch Pear applications securely
-   Exec=launchapear
-   Icon=launchapear
-   Categories=Office;Utility;Network;
-   Terminal=false
-   EOF
-   
-   # Build the AppImage
-   ./linuxdeploy-x86_64.AppImage --appdir=AppDir --output=appimage
+   md5sum -c LaunchAPear-md5sums.txt
    ```
+3. You should see "OK" if the checksum matches
 
-## Dependencies
+Alternatively, you can generate and compare the checksums manually:
+```bash
+md5sum LaunchAPear-*.AppImage
+cat LaunchAPear-md5sums.txt
+```
 
-- zenity
-- pear
-- gpg
+## Manual Install
 
-## License
-
-This project is licensed under the terms of the included LICENSE file.
-
-## DISCLAIMER
-Only launch link you trust !
-this script is delivered "as is" and the author deny any and all liability for any damages arising out of using it! 
-
-## check
+### check
 make sure *launchapear.sh* and *shortcut_installer.sh* are executable,  
 if not :  
 `chmod 755 launchapear.sh`  
 `chmod 755 shortcut_installer.sh`  
 
-## Install
+### Install
 Download this repository in folder of your choice:
 in terminal, (Ctrl + Alt +T)
-`git clone git@github.com:Acktarius/launchapear.git`  
+`git clone https://github.com/Acktarius/launchapear.git`  
 `cd launchapear`  
 `source shortcut_installer.sh`  
 
 new icon should appear on your desktop, if not logout and log back in.
-
----  
-
-#TODO: 
-
-- [ ] Sandbox
-- [x] Personal encrypted whitelist
 
 ---  
 comments, questions, suggestions:  

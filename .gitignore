@@ -7,7 +7,7 @@ AppDir/
 linuxdeploy-*.AppImage
 # But keep important scripts
 !AppRun
-!basic_apprun.sh
+
 
 # Temporary files
 info_temp.md

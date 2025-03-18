@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*'
 
+# Explicitly set permissions
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -72,12 +76,25 @@ jobs:
           
           # Build the AppImage
           ./linuxdeploy-x86_64.AppImage --appdir=AppDir --output=appimage
+          
+          # List the created files
+          ls -la *.AppImage
+
+      - name: Generate MD5 checksum
+        run: |
+          # Create MD5 checksum file
+          md5sum LaunchAPear*.AppImage > LaunchAPear-md5sums.txt
+          
+          # Show generated MD5 file
+          cat LaunchAPear-md5sums.txt
 
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          files: LaunchAPear*.AppImage
+          files: |
+            LaunchAPear*.AppImage
+            LaunchAPear-md5sums.txt
           draft: false
           prerelease: false
           generate_release_notes: true
