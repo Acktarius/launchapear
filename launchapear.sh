@@ -302,17 +302,16 @@ fi
 inWhiteList() {
 local inWhiteList=1    
 declare -a whiteListArray
-#local gpg_output
-#gpg_output=$(gpg --no-symkey-cache -qd ${WHITELIST_FILE} 2>&1)
+local gpg_output
+gpg_output=$(gpg --no-symkey-cache -qd ${WHITELIST_FILE} 2>&1)
 
 # First check if decryption failed before trying to process output
-#if [[ "$gpg_output" == *"decryption failed"* ]]; then
-#    zenwarn "wrong password, please try again"
-#    trip
-#fi
-read -a whiteListArray <<< $(gpg -qd ${WHITELIST_FILE})
+if [[ "$gpg_output" == *"decryption failed"* ]]; then
+    zenwarn "wrong password, please try again"
+    trip
+fi
 # Only process the whitelist if decryption succeeded
-#read -a whiteListArray <<< "$gpg_output"
+read -a whiteListArray <<< "$gpg_output"
 
 for entry in ${whiteListArray[@]}; do
     if [[ "${entry}" == "${pearLink}" ]]; then
