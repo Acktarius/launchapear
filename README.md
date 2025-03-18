@@ -44,7 +44,7 @@ The application is available as an AppImage, which provides these benefits:
    ./LaunchAPear-*.AppImage
    ```
 
-When running as an AppImage, the application uses a custom environment variable (`LAUNCHAPEAR_APPIMAGE`) to reliably detect the execution environment. The whitelist is stored in `~/.local/share/launchapear/` directory (following the XDG Base Directory specification), ensuring user-specific data remains in the user's home directory with proper write permissions. When running directly as a script, it will use the whitelist in the current directory.
+When running as an AppImage, the application will automatically detect the AppImage environment and store the whitelist in `~/.local/share/launchapear/` directory (following the XDG Base Directory specification). When running directly as a script, it will use the whitelist in the current directory.
 
 ### Verifying Integrity
 
