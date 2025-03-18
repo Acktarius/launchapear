@@ -19,7 +19,7 @@ The application is available as an AppImage, which provides these benefits:
 
 ### Using the AppImage
 
-1. Download the latest AppImage from the [Releases](https://github.com/yourusername/launchapear/releases) page
+1. Download the latest AppImage from the [Releases](https://github.com/Acktarius/launchapear/releases) page
 2. Make it executable:
    ```bash
    chmod +x LaunchAPear-*.AppImage
@@ -93,7 +93,7 @@ if not :
 ## Install
 Download this repository in folder of your choice:
 in terminal, (Ctrl + Alt +T)
-`git clone https://github.com/Acktarius/launchapear.git`  
+`git clone git@github.com:Acktarius/launchapear.git`  
 `cd launchapear`  
 `source shortcut_installer.sh`  
 
